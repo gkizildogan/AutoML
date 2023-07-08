@@ -9,3 +9,4 @@ catboost_info
 *.csv
 *error.log*
 *debug.log*
+testfile.py
