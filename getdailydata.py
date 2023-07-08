@@ -157,13 +157,13 @@ common_columns_adjclose = list(set(df_adjclose_all.columns) & set(df_adjclose.co
 common_columns_volume = list(set(df_volume_all.columns) & set(df_volume.columns))
 
 df_close_all = pd.concat([df_close_all, df_close[common_columns_close]], ignore_index=True)
-df_close_all.to_csv(close_name)
+df_close_all.to_csv(close_name, index=False)
 
 df_adjclose_all = pd.concat([df_adjclose_all, df_adjclose[common_columns_adjclose]], ignore_index=True)
-df_adjclose_all.to_csv(adjclose_name)
+df_adjclose_all.to_csv(adjclose_name, index=False)
 
 df_volume_all = pd.concat([df_volume_all, df_volume[common_columns_volume]], ignore_index=True)
-df_volume_all.to_csv(volume_name)
+df_volume_all.to_csv(volume_name, index=False)
 
 with open(file_name, 'w') as file:
     file.write(str(sday))
