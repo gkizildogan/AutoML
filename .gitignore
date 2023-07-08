@@ -6,5 +6,6 @@ catboost_info
 *.logs
 *.txt
 *.env
+*.csv
 *error.log*
 *debug.log*
