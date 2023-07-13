@@ -44,9 +44,9 @@ def history_to_df(df, values):
     return new_df
 
 
-df_close = history_to_df(df_hist, values='close')
-df_adjclose = history_to_df(df_hist, values='adjclose')
-df_volume = history_to_df(df_hist, values='volume')
+df_close = history_to_df(df_hist, values = 'close')
+df_adjclose = history_to_df(df_hist, values = 'adjclose')
+df_volume = history_to_df(df_hist, values = 'volume')
 
 common_columns_close = list(set(df_close_all.columns) & set(df_close.columns))
 common_columns_adjclose = list(set(df_adjclose_all.columns) & set(df_adjclose.columns))
