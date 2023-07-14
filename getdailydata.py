@@ -20,7 +20,8 @@ df_copy['date'] = pd.to_datetime(df_copy['date'], format='%d/%m/%Y', dayfirst=Tr
 lastday = df_copy['date'].max().strftime('%Y-%m-%d')
 lastdaydate = datetime.strptime(lastday, '%Y-%m-%d').date()
 sday = lastdaydate + timedelta(days=1)
-eday = datetime.today().date()
+eday = datetime.today() + timedelta(days=1)
+eday = eday.date()
 
 stocks = df_adjclose_all.columns[1:].tolist()
 tickers = Ticker(stocks)
@@ -28,8 +29,7 @@ df_hist = tickers.history(start=sday, end=eday, interval='1d')
 
 
 def history_to_df(df, values):
-    df_new = df.reset_index().pivot(index='date',
-                                           columns='symbol', values=values)
+    df_new = df.reset_index().pivot(index='date',columns='symbol', values=values)
 
     new_row = df_new.iloc[0].copy()
     for col in new_row.index:
