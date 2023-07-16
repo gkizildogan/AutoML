@@ -1,19 +1,15 @@
-#############################
 import yfinance as yf
 from datetime import date,timedelta,datetime
 import pandas as pd
 import numpy as np
+from getdata import datagetter
 
 with open('stocks.txt') as f:
     stocks = f.read().splitlines()
 
 stocksa = " ".join(stocks)
 
-history_df = yf.download(stocksa,period='7d', interval='1m', group_by='ticker')
-transposed_history = history_df.stack(level=1).rename_axis(['Datetime', 'Ticker']).reset_index(level=1)
-adj_close_df = transposed_history[transposed_history['Ticker'] == 'Adj Close'].drop('Ticker', axis=1)
-volume_df = transposed_history[transposed_history['Ticker'] == 'Volume'].drop('Ticker', axis=1)
-
+adj_close_df, close_df, low_df, high_df, open_df, volume_df = datagetter(stocks,interval='1m')
 sel_stocks = ["ALBRK.IS","GARAN.IS","HALKB.IS","ISCTR.IS"]
 bankalar = " ".join(sel_stocks)
 history_df = yf.download(bankalar,period='7d', interval='1m', group_by='ticker')
