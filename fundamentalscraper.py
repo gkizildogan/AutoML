@@ -11,22 +11,50 @@ import os
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 
-def remove_spaces_and_replace_o(column_name):
-    return column_name.lower().replace(" ", "_").replace("ö", "o").replace("ü","u").replace("$","usd").replace("ğ","g").replace("ç","c")\
-        .replace("ş","s").replace("(","_").replace(")","_").replace("/","_").replace("%","yuzde").replace("â","a").replace("ı","i")
 
+char_mapping = {
+    "İ": "I",
+    "ı": "i",
+    "Â": "A",
+    "â": "a",
+    "Î": "I",
+    "î": "i",
+    "Ş": "S",
+    "ş": "s",
+    "Ö": "O",
+    "ö": "o",
+    "Ü": "U",
+    "ü": "u",
+    "Ğ": "G",
+    "ğ": "g",
+    "Ç": "C",
+    "ç": "c",
+    "%": "yuzde",
+    "(": "_",
+    ")": "_",
+    "+": "_",
+    " ": "_",
+    "-": "_",
+    "/": "_",
+    ".": "_",
+    "$": "usd"
+}
+
+char_mapping_2 = {
+    "__": "_"
+}
 
 s = Service('D:/chromedriver/chromedriver-win64/chromedriver.exe')
 
 
 driver = webdriver.Chrome(service=s)
 driver.get('https://halkyatirim.com.tr/skorkart')
-
-time.sleep(10)
+element = WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.ID, "DropDownEnstrumanKodu")))
 select_element = driver.find_element(By.ID, 'DropDownEnstrumanKodu')
 select = Select(select_element)
 
 bugunun_tarihi = pd.Timestamp('today').strftime('%Y-%m-%d')
+
 # Dropdown options
 opts = select.options
 
@@ -47,15 +75,14 @@ all_karlilik_tablo = []
 all_carpanlar_tablo = []
 
 opt_list = opt_list[1:]
-#for i in range(1, len(opt_list)):
+
 for idx, opt_name in enumerate(opt_list):
     select.options[idx+1].click()
-    time.sleep(60)
+    element = WebDriverWait(driver, 60).until(EC.visibility_of_element_located((By.ID, "LabelEnstrumanKodu")))
     # Wait ekle div class id='divSirketVerileri
     page_source = driver.page_source
     soup = BeautifulSoup(page_source, 'lxml')
     tablolar = soup.findChildren('table')
-    #element = WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.ID, "LabelEnstrumanKodu")))
 
     # Temel Bilgiler
     enstruman_kodu = driver.find_element(By.ID,'LabelEnstrumanKodu').text
@@ -126,7 +153,10 @@ for idx, opt_name in enumerate(opt_list):
 
     df_fiyat_perf_enstru.insert(0, "veri_toplanma_tarihi", str(bugunun_tarihi))
     df_fiyat_perf_enstru.insert(1, "enstruman_kodu", str(enstruman_kodu))
-    df_fiyat_perf_enstru.columns = df_fiyat_perf_enstru.columns.map(remove_spaces_and_replace_o)
+    df_fiyat_perf_enstru = df_fiyat_perf_enstru.rename(
+        columns=lambda col: ''.join(char_mapping.get(c, c) for c in col).lower().rstrip('_'))
+    df_fiyat_perf_enstru = df_fiyat_perf_enstru.rename(
+        columns=lambda col: ''.join(char_mapping_2.get(c, c) for c in col).lower().rstrip('_'))
 
     piyasadegertablosu = tablolar[2]
     header = []
@@ -142,7 +172,10 @@ for idx, opt_name in enumerate(opt_list):
     df_piyasa_deger = pd.DataFrame([piyasa_deger_miktari], columns=piyasa_deger_adi)
     df_piyasa_deger.insert(0, "veri_toplanma_tarihi", str(bugunun_tarihi))
     df_piyasa_deger.insert(1, "enstruman_kodu", str(enstruman_kodu))
-    df_piyasa_deger.columns = df_piyasa_deger.columns.map(remove_spaces_and_replace_o)
+    df_piyasa_deger = df_piyasa_deger.rename(
+        columns=lambda col: ''.join(char_mapping.get(c, c) for c in col).lower().rstrip('_'))
+    df_piyasa_deger = df_piyasa_deger.rename(
+        columns=lambda col: ''.join(char_mapping_2.get(c, c) for c in col).lower().rstrip('_'))
 
 
     teknikveritablosu = tablolar[3]
@@ -165,7 +198,10 @@ for idx, opt_name in enumerate(opt_list):
     df_indikator = pd.concat([df_indikator_deger, df_indikator_yorum], axis=1)
     df_indikator.insert(0, "veri_toplanma_tarihi", str(bugunun_tarihi))
     df_indikator.insert(1, "enstruman_kodu", str(enstruman_kodu))
-    df_indikator.columns = df_indikator.columns.map(remove_spaces_and_replace_o)
+    df_indikator = df_indikator.rename(
+        columns=lambda col: ''.join(char_mapping.get(c, c) for c in col).lower().rstrip('_'))
+    df_indikator = df_indikator.rename(
+        columns=lambda col: ''.join(char_mapping_2.get(c, c) for c in col).lower().rstrip('_'))
 
     temel_analiz_tablosu = tablolar[4]
     header = []
@@ -182,7 +218,10 @@ for idx, opt_name in enumerate(opt_list):
     df_temel_analiz = pd.DataFrame([temel_deger_degeri], columns=temel_deger_adi)
     df_temel_analiz.insert(0, "veri_toplanma_tarihi", str(bugunun_tarihi))
     df_temel_analiz.insert(1, "enstruman_kodu", str(enstruman_kodu))
-    df_temel_analiz.columns = df_temel_analiz.columns.map(remove_spaces_and_replace_o)
+    df_temel_analiz = df_temel_analiz.rename(
+        columns=lambda col: ''.join(char_mapping.get(c, c) for c in col).lower().rstrip('_'))
+    df_temel_analiz = df_temel_analiz.rename(
+        columns=lambda col: ''.join(char_mapping_2.get(c, c) for c in col).lower().rstrip('_'))
 
     fiyat_ozet_tablosu = tablolar[5]
     header = []
@@ -199,8 +238,10 @@ for idx, opt_name in enumerate(opt_list):
     df_fiyat_ozet = pd.DataFrame([fiyat_ozet_degeri], columns=fiyat_ozet_adi)
     df_fiyat_ozet.insert(0, "veri_toplanma_tarihi", str(bugunun_tarihi))
     df_fiyat_ozet.insert(1, "enstruman_kodu", str(enstruman_kodu))
-    df_fiyat_ozet.columns = df_fiyat_ozet.columns.map(remove_spaces_and_replace_o)
-
+    df_fiyat_ozet = df_fiyat_ozet.rename(
+        columns=lambda col: ''.join(char_mapping.get(c, c) for c in col).lower().rstrip('_'))
+    df_fiyat_ozet = df_fiyat_ozet.rename(
+        columns=lambda col: ''.join(char_mapping_2.get(c, c) for c in col).lower().rstrip('_'))
 
     finansallar_tablosu = tablolar[6]
     header = []
@@ -221,7 +262,10 @@ for idx, opt_name in enumerate(opt_list):
     df_finansal_tablo = pd.DataFrame(finansal_tablo_deger, columns=finansal_tablo_sutun_isimleri)
     df_finansal_tablo.insert(0, "enstruman_kodu", str(enstruman_kodu))
     df_finansal_tablo.insert(1, "finans_donemi", finansal_tablo_index)
-    df_finansal_tablo.columns = df_finansal_tablo.columns.map(remove_spaces_and_replace_o)
+    df_finansal_tablo = df_finansal_tablo.rename(
+        columns=lambda col: ''.join(char_mapping.get(c, c) for c in col).lower().rstrip('_'))
+    df_finansal_tablo = df_finansal_tablo.rename(
+        columns=lambda col: ''.join(char_mapping_2.get(c, c) for c in col).lower().rstrip('_'))
 
     karlilik_tablosu = tablolar[7]
     header = []
@@ -239,7 +283,10 @@ for idx, opt_name in enumerate(opt_list):
     df_karlilik_tablo = pd.DataFrame(karlilik_tablo_deger, columns=karlilik_tablo_sutun_isimleri)
     df_karlilik_tablo.insert(0, "enstruman_kodu", str(enstruman_kodu))
     df_karlilik_tablo.insert(1, "finans_donemi", karlilik_tablo_index)
-    df_karlilik_tablo.columns = df_karlilik_tablo.columns.map(remove_spaces_and_replace_o)
+    df_karlilik_tablo = df_karlilik_tablo.rename(
+        columns=lambda col: ''.join(char_mapping.get(c, c) for c in col).lower().rstrip('_'))
+    df_karlilik_tablo = df_karlilik_tablo.rename(
+        columns=lambda col: ''.join(char_mapping_2.get(c, c) for c in col).lower().rstrip('_'))
 
 
     carpanlar_tablosu = tablolar[8]
@@ -258,7 +305,10 @@ for idx, opt_name in enumerate(opt_list):
     df_carpanlar_tablo = pd.DataFrame(carpanlar_tablo_deger, columns=carpanlar_tablo_sutun_isimleri)
     df_carpanlar_tablo.insert(0, "enstruman_kodu", str(enstruman_kodu))
     df_carpanlar_tablo.insert(1, "finans_donemi", carpanlar_tablo_index)
-    df_carpanlar_tablo.columns = df_carpanlar_tablo.columns.map(remove_spaces_and_replace_o)
+    df_carpanlar_tablo = df_carpanlar_tablo.rename(
+        columns=lambda col: ''.join(char_mapping.get(c, c) for c in col).lower().rstrip('_'))
+    df_carpanlar_tablo = df_carpanlar_tablo.rename(
+        columns=lambda col: ''.join(char_mapping_2.get(c, c) for c in col).lower().rstrip('_'))
 
     all_temel_bilgi.append(df_temel_bilgi)
     all_pazar_endeks.append(df_pazar_endeks)
@@ -271,6 +321,7 @@ for idx, opt_name in enumerate(opt_list):
     all_karlilik_tablo.append(df_karlilik_tablo)
     all_carpanlar_tablo.append(df_carpanlar_tablo)
 
+    print("scraped element: ", idx)
     time.sleep(5)
 
 all_temel_bilgi_df = pd.concat(all_temel_bilgi, ignore_index=True)
