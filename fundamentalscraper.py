@@ -60,7 +60,7 @@ all_finansal_tablo = []
 all_karlilik_tablo = []
 all_carpanlar_tablo = []
 
-opt_list = opt_list[:1]
+opt_list = opt_list[1:]
 for idx, opt_name in enumerate(opt_list):
     select.options[idx+1].click()
     element = WebDriverWait(driver, 60).until(EC.visibility_of_element_located((By.ID, "divSirketVerileri")))
